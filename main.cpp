@@ -8,6 +8,7 @@
 
 #include "defs.h"
 #include "global.h"
+#include "BorderTable.cpp"
 #include "StringMatching.cpp"
 
 using namespace std;
@@ -24,9 +25,6 @@ int main (int argc, char **argv)
 
 	clock_t start;
 	clock_t finish;
-
-
-
 
 	string line;
 	int lineCounter;
@@ -128,6 +126,11 @@ int main (int argc, char **argv)
 			}
 		}
 
+		cout<<endl;
+		cout<<resultingMatrix.sequence<<"\n";
+		cout<<resultingMatrix.score<<"\n";
+		resultingMatrix.printMatrix();
+
 		start = clock();
 		if ( mod == 0 )
 		{
@@ -144,24 +147,29 @@ int main (int argc, char **argv)
 				unsigned int * WP = new unsigned int [n];
 				wptable ( sigma, z, WP );
 
+				unsigned int * borderArray = new unsigned int[n];
+				borderArray = computerBorderArray(WP, n);
+
 				finish = clock();
 				double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
 				cout << "Elapsed time is " << passtime << endl;
 	#if 1
 				/*print*/
-				cout << "Weighted Prefix Table:\n";
+				cout << "\nWeighted Prefix Table:\n";
 				for ( unsigned int i = 0; i < n; i++ )
 				{
-					cout << WP[i] << '\n';
+					cout << WP[i] << ' ';
 				}
+
+				cout << "\nWeighted Border Table:\n";
+				for(int r = 0; r<n;r++)
+				{
+					cout<<borderArray[r]<<" ";
+				}
+				cout<<endl;
 	#endif
 			}
 		}
-
-
-		cout<<resultingMatrix.sequence<<"\n";
-		cout<<resultingMatrix.score<<"\n";
-		resultingMatrix.printMatrix();
 	}
 
 //	/* read input Weighted String */
