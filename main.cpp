@@ -10,18 +10,16 @@
 #include "global.h"
 #include "Read.h"
 #include "ProbabilityMatrix.h"
-#include "BorderTable.cpp"
+#include "BorderTable.h"
 
 using namespace std;
 
 int main (int argc, char **argv)
 {
-	cout<<"hello";
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	string weightedStringFile = "/home/yordan/workspace/FinalYearProject/data/text0.txt";
-	double z = 100000;
+	double z = 100;
 	double ** y;			//weighted string
 	unsigned int n;			//length of y
 
@@ -102,6 +100,8 @@ int main (int argc, char **argv)
 				rightVector.at(vi).getScore()+
 				leftVector.at(vi).getScore());
 
+		start = clock();
+
 		resultingMatrix.applyBigram(401); // window size 401
 		resultingMatrix.applyQualityScore(100); // QS:BiGram = 100:1
 
@@ -117,84 +117,45 @@ int main (int argc, char **argv)
 			}
 		}
 
-		cout<<endl;
 		cout<<resultingMatrix.getSequence()<<"\n";
 		cout<<resultingMatrix.getScore()<<"\n";
 		resultingMatrix.printMatrix();
 
-		start = clock();
-		if ( mod == 0 )
+		string empty;
+		if ( ! ( preparation ( empty, y, n, z, alphabet, mod ) ) )
 		{
-			string empty;
-			if ( ! ( preparation ( empty, y, n, z, alphabet, mod ) ) )
+			return 0;
+		}
+		else
+		{
+			for ( unsigned int i = 0; i < n; i++ )
+				delete[] y[i];
+			delete[] y;
+			unsigned int * WP = new unsigned int [n];
+			wptable ( sigma, z, WP );
+
+			unsigned int * borderArray = new unsigned int[n];
+			borderArray = computerBorderArray(WP, n);
+
+			finish = clock();
+			double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
+			cout << "Elapsed time is " << passtime << endl;
+#if 1
+			/*print*/
+			cout << "\nWeighted Prefix Table:\n";
+			for ( unsigned int i = 0; i < n; i++ )
 			{
-				return 0;
+				cout << WP[i] << ' ';
 			}
-			else
+
+			cout << "\nWeighted Border Table:\n";
+			for(int r = 0; r<n;r++)
 			{
-				for ( unsigned int i = 0; i < n; i++ )
-					delete[] y[i];
-				delete[] y;
-				unsigned int * WP = new unsigned int [n];
-				wptable ( sigma, z, WP );
-
-				unsigned int * borderArray = new unsigned int[n];
-				borderArray = computerBorderArray(WP, n);
-
-				finish = clock();
-				double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
-				cout << "Elapsed time is " << passtime << endl;
-	#if 1
-				/*print*/
-				cout << "\nWeighted Prefix Table:\n";
-				for ( unsigned int i = 0; i < n; i++ )
-				{
-					cout << WP[i] << ' ';
-				}
-
-				cout << "\nWeighted Border Table:\n";
-				for(int r = 0; r<n;r++)
-				{
-					cout<<borderArray[r]<<" ";
-				}
-				cout<<endl;
-	#endif
+				cout<<borderArray[r]<<" ";
 			}
+			cout<<endl;
+#endif
 		}
 	}
-
-//	/* read input Weighted String */
-//	ifstream weighted ( weightedStringFile );
-//	if ( weighted.fail() )
-//	{
-//		cout << "Error: Cannot open the weighted string file!" << endl;
-//		return 0;
-//	}
-//	else
-//	{
-//		double temp;
-//		long int num = 0;
-//		unsigned int column = alphabet.size();
-//		while ( !weighted.eof() )
-//		{
-//			weighted >> temp;
-//			num ++;
-//		}
-//		unsigned int row = num / column;
-//		y = new double * [row];
-//		for ( unsigned int i = 0; i < row; i++ )
-//			y[i] = new double [column];
-//		weighted.clear();
-//		weighted.seekg( 0, ios::beg );
-//		for ( unsigned int i = 0; i < row; i++ )
-//		{
-//			for ( unsigned int j = 0; j < column; j++ )
-//			{
-//				weighted >> y[i][j];
-//			}
-//		}
-//		n = row;
-//		weighted.close();
-//	}
 	return 0;
 }
