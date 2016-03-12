@@ -8,13 +8,15 @@
 
 #include "defs.h"
 #include "global.h"
+#include "Read.h"
+#include "ProbabilityMatrix.h"
 #include "BorderTable.cpp"
-#include "StringMatching.cpp"
 
 using namespace std;
 
 int main (int argc, char **argv)
 {
+	cout<<"hello";
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
@@ -28,14 +30,20 @@ int main (int argc, char **argv)
 
 	string line;
 	int lineCounter;
-	vector<ProbabilityMatrix> leftProbabilityMatrixes;
-	vector<ProbabilityMatrix> rightProbabilityMatrixes;
+
+	vector<Read> leftVector;
+	vector<Read> rightVector;
 
 	string left_sequenceID;
 	string left_sequence;
 	string left_score;
 
-	ifstream left_file ("data/left.txt", ios::in);
+	string right_sequenceID;
+	string right_sequence;
+	string right_score;
+
+	//Read left file
+	ifstream left_file ("left.txt", ios::in);
 	if (left_file.is_open())
 	{
 		lineCounter = 0;
@@ -45,28 +53,23 @@ int main (int argc, char **argv)
 			{
 			  case 0: left_sequenceID = line; break;
 			  case 1: left_sequence = line; break;
-			  case 2: break;
 			  case 3:
 			  {
 				  left_score = line;
 
 				  //Add to vector
-				  ProbabilityMatrix left_probability_matrix(left_sequence,left_score);
-				  leftProbabilityMatrixes.push_back(left_probability_matrix);
+				  Read left_read(left_sequence,left_score);
+				  leftVector.push_back(left_read);
 			  } break;
 			  default: break;
 			}
 			lineCounter++;
 		}
-
 		left_file.close();
 	}
 
-	string right_sequenceID;
-	string right_sequence;
-	string right_score;
-
-	ifstream right_file ("data/right.txt", ios::in);
+	//Read right file
+	ifstream right_file ("right.txt", ios::in);
 	if (right_file.is_open())
 	{
 		lineCounter = 0;
@@ -76,28 +79,13 @@ int main (int argc, char **argv)
 			{
 			  case 0: right_sequenceID = line; break;
 			  case 1: right_sequence = line; break;
-			  case 2: break;
 			  case 3:
 			  {
 				  right_score = line;
-
-				  // Convert read from right file to reverse DNA inverse
-				  char tempSequence;
-				  char tempScore;
-				  for(unsigned int i = 0; i<((right_sequence.size()/2)+(right_sequence.size()%2)); i++)
-				  {
-					  tempSequence = right_sequence[i];
-					  right_sequence[i] = dnaInverse(right_sequence[right_sequence.size()-1-i]);
-					  right_sequence[right_sequence.size()-1-i] = dnaInverse(tempSequence);
-
-					  tempScore = right_score[i];
-					  right_score[i] = right_score[right_score.size()-1-i];
-					  right_score[right_score.size()-1-i] = tempScore;
-				  }
-
 				  //Add to vector
-				  ProbabilityMatrix right_probability_matrix(right_sequence,right_score);
-				  rightProbabilityMatrixes.push_back(right_probability_matrix);
+				  Read right_read(right_sequence,right_score);
+				  right_read.calculateReadInverse();
+				  rightVector.push_back(right_read);
 			  } break;
 			  default: break;
 			}
@@ -106,15 +94,18 @@ int main (int argc, char **argv)
 		right_file.close();
 	}
 
-	for(unsigned int vi = 0; vi < leftProbabilityMatrixes.size() && vi < rightProbabilityMatrixes.size();vi++)
+	for(unsigned int vi = 0; vi < leftVector.size() && vi < rightVector.size();vi++)
 	{
-		StringMatching in(&leftProbabilityMatrixes.at(vi), &rightProbabilityMatrixes.at(vi));
+		ProbabilityMatrix resultingMatrix(
+				rightVector.at(vi).getSequence()+
+				leftVector.at(vi).getSequence(),
+				rightVector.at(vi).getScore()+
+				leftVector.at(vi).getScore());
 
-		ProbabilityMatrix resultingMatrix = in.joinedMatrix();
-		resultingMatrix.setInitialMatrix();
-		resultingMatrix.calculateDistributedMatrixProbability(100);
+		resultingMatrix.applyBigram(401); // window size 401
+		resultingMatrix.applyQualityScore(100); // QS:BiGram = 100:1
 
-		n = resultingMatrix.sequence.size();
+		n = resultingMatrix.getSize();
 		y = new double * [n];
 		for ( unsigned int i = 0; i < n; i++ )
 			y[i] = new double [4];
@@ -122,13 +113,13 @@ int main (int argc, char **argv)
 		{
 			for(int coc=0;coc<4;coc++)
 			{
-				y[mac][coc]=resultingMatrix.getMatrix()[coc][mac];
+				y[mac][coc]=resultingMatrix.getMatrix()[mac][coc];
 			}
 		}
 
 		cout<<endl;
-		cout<<resultingMatrix.sequence<<"\n";
-		cout<<resultingMatrix.score<<"\n";
+		cout<<resultingMatrix.getSequence()<<"\n";
+		cout<<resultingMatrix.getScore()<<"\n";
 		resultingMatrix.printMatrix();
 
 		start = clock();
