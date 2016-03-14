@@ -13,17 +13,20 @@ Read::Read(string sequenceIn, string scoreIn) {
 }
 
 Read::~Read() {
-
+	// TODO Auto-generated destructor stub
 }
 
-string Read:: getSequence() {
+string Read::getSequence() {
 	return sequence;
 }
 
-string Read:: getScore() {
+string Read::getScore() {
 	return score;
 }
 
+int Read::getSize() {
+	return sequence.size();
+}
 void Read::calculateReadInverse() {
 	// Convert read from right file to DNA inverse
 	char tempSequence;
@@ -47,6 +50,6 @@ char dnaInverse(char in) {
 	case 'C': return 'G';
 	case 'G': return 'C';
 	case 'T': return 'A';
-	default: return 'E';
+	default: return 'N';
 	}
 }

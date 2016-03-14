@@ -19,7 +19,8 @@ int main (int argc, char **argv)
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	double z = 100;
+	double z = 10; //The larger the threshold the higher the value of overlap
+	double z1 = 10; //The lower the threshold the higher the tolerance to overlap
 	double ** y;			//weighted string
 	unsigned int n;			//length of y
 
@@ -47,7 +48,7 @@ int main (int argc, char **argv)
 		lineCounter = 0;
 		while (getline(left_file, line))
 		{
-			switch (lineCounter%5)
+			switch (lineCounter%4)
 			{
 			  case 0: left_sequenceID = line; break;
 			  case 1: left_sequence = line; break;
@@ -73,7 +74,7 @@ int main (int argc, char **argv)
 		lineCounter = 0;
 		while (getline(right_file, line))
 		{
-			switch (lineCounter%5)
+			switch (lineCounter%4)
 			{
 			  case 0: right_sequenceID = line; break;
 			  case 1: right_sequence = line; break;
@@ -92,6 +93,7 @@ int main (int argc, char **argv)
 		right_file.close();
 	}
 
+	stringstream output;
 	for(unsigned int vi = 0; vi < leftVector.size() && vi < rightVector.size();vi++)
 	{
 		ProbabilityMatrix resultingMatrix(
@@ -103,25 +105,17 @@ int main (int argc, char **argv)
 		start = clock();
 
 		resultingMatrix.applyBigram(401); // window size 401
-		resultingMatrix.applyQualityScore(100); // QS:BiGram = 100:1
-
-		n = resultingMatrix.getSize();
-		y = new double * [n];
-		for ( unsigned int i = 0; i < n; i++ )
-			y[i] = new double [4];
-		for(int mac=0;mac<n;mac++)
-		{
-			for(int coc=0;coc<4;coc++)
-			{
-				y[mac][coc]=resultingMatrix.getMatrix()[mac][coc];
-			}
-		}
+		resultingMatrix.applyQualityScore(1); // QS:BiGram = 100:1
 
 		cout<<resultingMatrix.getSequence()<<"\n";
 		cout<<resultingMatrix.getScore()<<"\n";
 		resultingMatrix.printMatrix();
 
+		n = resultingMatrix.getSize();
+		y = resultingMatrix.getMatrix();
+
 		string empty;
+		unsigned int * borderArray;
 		if ( ! ( preparation ( empty, y, n, z, alphabet, mod ) ) )
 		{
 			return 0;
@@ -134,15 +128,15 @@ int main (int argc, char **argv)
 			unsigned int * WP = new unsigned int [n];
 			wptable ( sigma, z, WP );
 
-			unsigned int * borderArray = new unsigned int[n];
+			borderArray = new unsigned int[n];
 			borderArray = computerBorderArray(WP, n);
 
 			finish = clock();
 			double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
 			cout << "Elapsed time is " << passtime << endl;
-#if 1
+
 			/*print*/
-			cout << "\nWeighted Prefix Table:\n";
+			cout << "Weighted Prefix Table:\n";
 			for ( unsigned int i = 0; i < n; i++ )
 			{
 				cout << WP[i] << ' ';
@@ -154,8 +148,39 @@ int main (int argc, char **argv)
 				cout<<borderArray[r]<<" ";
 			}
 			cout<<endl;
-#endif
 		}
+
+		int shortestReadLength = min(rightVector.at(vi).getSize(), leftVector.at(vi).getSize());
+		int overlap = borderArray[n-1];
+		if(shortestReadLength<overlap)
+		{
+			int window;
+			for(int i = 0; i < shortestReadLength; i++)
+			{
+				window = leftVector.at(vi).getSize()-i;
+				if(leftVector.at(vi).getSequence().substr(leftVector.at(vi).getSize()-window,window)==rightVector.at(vi).getSequence().substr(0,window))
+					break;
+			}
+			overlap = 0;
+			for(int k = 0; k<window;k++)
+			{
+				double averageOfScoreValues = (1-pow(10.0,(33.0-((double)((int)(leftVector.at(vi).getScore()[leftVector.at(vi).getSize()-1-k]))))/10.0) +
+						1-pow(10.0,(33.0-((double)((int)(leftVector.at(vi).getScore()[k]))))/10.0)) / 2;
+				if(averageOfScoreValues > 1.0-1/z1)
+					overlap++;
+			}
+		}
+
+		string joinedString = resultingMatrix.getSequence().substr(rightVector.at(vi).getSize())+
+				resultingMatrix.getSequence().substr(overlap,rightVector.at(vi).getSize());
+		cout<< joinedString<<endl;
+
+		output<<joinedString+"\n";
+		cout<<endl;
 	}
+	ofstream file;
+	file.open("output.txt");
+	file<<output.str();
+	file.close();
 	return 0;
 }

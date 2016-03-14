@@ -18,6 +18,7 @@ ProbabilityMatrix::ProbabilityMatrix(string sequenceIn, string scoreIn) {
 	baseMapping['C'] = 1;
 	baseMapping['G'] = 2;
 	baseMapping['T'] = 3;
+	baseMapping['N'] = 4;
 }
 ProbabilityMatrix::~ProbabilityMatrix() {
 	// TODO Auto-generated destructor stub
@@ -92,20 +93,24 @@ void ProbabilityMatrix::applyBigram(int windowSize)
 			end = currentPosition+windowSuffix;
 		}
 		//Define combination counter for the window
-		int count[4][4]={};
+		int count[5][5]={};
 		for(int k = start;k<end;k++)
 		{
 			++count[baseMapping[sequence[k]]][baseMapping[sequence[k+1]]];
 		}
 		//Check total count of possible combinations
-		int sum = 0;
-		for(int l = 0; l < 4; l++){
+		double sum = 0;
+		for(int l = 0; l < 5; l++){
 			sum+= count[baseMapping[sequence[currentPosition-1]]][l];
 		}
-		matrix[currentPosition][baseMapping['A']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/sum;
-		matrix[currentPosition][baseMapping['C']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/sum;
-		matrix[currentPosition][baseMapping['G']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/sum;
-		matrix[currentPosition][baseMapping['T']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum;
+		matrix[currentPosition][baseMapping['A']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/sum +
+				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+		matrix[currentPosition][baseMapping['C']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/sum +
+				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+		matrix[currentPosition][baseMapping['G']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/sum +
+				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+		matrix[currentPosition][baseMapping['T']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum +
+				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
 	}
 }
 
@@ -114,7 +119,14 @@ void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
 	{
 		//Take the int value of the ASCII char as double and use it in the conversion formula
 		double value = 1-pow(10.0,(33.0-((double)((int)(score[i]))))/10.0);
+
+		if(sequence[i]=='N' || score[i] == (char) 34)
+		{
+			value = 0.25;
+		}
 		double notValue = 1-value;
+		double maxProb = 0.0;
+		char maxValue = 'N';
 		for(int k= 0; k < 4; k++)
 		{
 			double temp = matrix[i][k];
@@ -124,7 +136,18 @@ void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
 			else {
 				matrix[i][k] = (temp+(qsCoefficient*notValue/3.0))/(qsCoefficient+1.0);
 			}
+			if(matrix[i][k]>=maxProb)
+			{
+				maxProb = matrix[i][k];
+				switch(k)
+				{
+				case 0: maxValue = 'A'; break;
+				case 1: maxValue = 'C'; break;
+				case 2: maxValue = 'G'; break;
+				case 3: maxValue = 'T'; break;
+				}
+			}
 		}
+		sequence[i] = maxValue;
 	}
 }
-
