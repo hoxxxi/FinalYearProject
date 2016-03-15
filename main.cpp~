@@ -25,8 +25,8 @@ int main (int argc, char **argv)
 	clock_t start;
 	clock_t finish;
 
-	ifstream left_file ("/home/yordan/Desktop/left.fastq", ios::in);
-	ifstream right_file ("/home/yordan/Desktop/right.fastq", ios::in);
+	ifstream left_file ("/home/yordan/Desktop/frag_1.fastq", ios::in);
+	ifstream right_file ("/home/yordan/Desktop/frag_2.fastq", ios::in);
 
 	ofstream file;
 	file.open("output.txt");
@@ -108,7 +108,7 @@ int main (int argc, char **argv)
 						}
 						string joinedString = resultingMatrix.getSequence().substr(right_read.size()+1)+
 								resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
-//						cout<<"Row: "<<lineCounter/4<<endl;
+						cout<<"Row: "<<lineCounter/4<<endl;
 
 						//Write to file
 						ofstream file;

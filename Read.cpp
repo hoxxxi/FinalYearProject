@@ -13,7 +13,7 @@ Read::Read(string sequenceIn, string scoreIn) {
 }
 
 Read::~Read() {
-
+//	cout<<"Read destroyed: "<<sequence<<endl;
 }
 
 string Read::getSequence() {
