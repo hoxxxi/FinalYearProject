@@ -7,7 +7,8 @@
 
 #include "ProbabilityMatrix.h"
 
-ProbabilityMatrix::ProbabilityMatrix(string sequenceIn, string scoreIn) {
+ProbabilityMatrix::ProbabilityMatrix(string sequenceIn, string scoreIn,  int splitPointIn) {
+	splitPoint = splitPointIn;
 	sequence = sequenceIn;
 	score = scoreIn;
 	size = sequenceIn.size();
@@ -21,7 +22,9 @@ ProbabilityMatrix::ProbabilityMatrix(string sequenceIn, string scoreIn) {
 	baseMapping['N'] = 4;
 }
 ProbabilityMatrix::~ProbabilityMatrix() {
-	// TODO Auto-generated destructor stub
+	for ( unsigned int i = 0; i < size; i++ )
+		delete[] matrix[i];
+	delete[] matrix;
 }
 string ProbabilityMatrix::getSequence() {
 	return sequence;
@@ -37,11 +40,14 @@ double** ProbabilityMatrix::getMatrix() {
 }
 
 void ProbabilityMatrix::printMatrix() {
+	cout<<endl;
+	double roundedValue;
 	for(int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			cout<<matrix[i][j]<<'\t';
+			roundedValue =((int) (matrix[i][j]*100))/100.0;
+			cout<<roundedValue<<'\t';
 		}
 		cout<<endl;
 	}
@@ -60,12 +66,6 @@ void ProbabilityMatrix::setZeroMatrix() {
 void ProbabilityMatrix::applyBigram(int windowSize)
 {
 	windowSize = (windowSize-1)/2;
-
-	//Chargaff's rule
-	matrix[0][baseMapping['A']]=0.292;
-	matrix[0][baseMapping['C']]=0.206;
-	matrix[0][baseMapping['G']]=0.201;
-	matrix[0][baseMapping['T']]=0.301;
 
 	for(int currentPosition = 1; currentPosition < size; currentPosition++)
 	{
@@ -112,6 +112,23 @@ void ProbabilityMatrix::applyBigram(int windowSize)
 		matrix[currentPosition][baseMapping['T']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum +
 				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
 	}
+
+	//Clear split point
+	matrix[splitPoint][baseMapping['A']]=0.25;
+	matrix[splitPoint][baseMapping['C']]=0.25;
+	matrix[splitPoint][baseMapping['G']]=0.25;
+	matrix[splitPoint][baseMapping['T']]=0.25;
+
+	//Chargaff's rule
+	matrix[0][baseMapping['A']]=0.292;
+	matrix[0][baseMapping['C']]=0.206;
+	matrix[0][baseMapping['G']]=0.201;
+	matrix[0][baseMapping['T']]=0.301;
+
+	matrix[splitPoint+1][baseMapping['A']]=0.292;
+	matrix[splitPoint+1][baseMapping['C']]=0.206;
+	matrix[splitPoint+1][baseMapping['G']]=0.201;
+	matrix[splitPoint+1][baseMapping['T']]=0.301;
 }
 
 void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
@@ -150,4 +167,11 @@ void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
 		}
 		sequence[i] = maxValue;
 	}
+
+	//Clear split point
+	sequence[splitPoint] = '$';
+	matrix[splitPoint][baseMapping['A']]=0;
+	matrix[splitPoint][baseMapping['C']]=0;
+	matrix[splitPoint][baseMapping['G']]=0;
+	matrix[splitPoint][baseMapping['T']]=0;
 }

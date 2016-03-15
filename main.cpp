@@ -19,25 +19,17 @@ int main (int argc, char **argv)
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	double z = 10; //The larger the threshold the higher the value of overlap
-	double z1 = 10; //The lower the threshold the higher the tolerance to overlap
+	double z = 20; //The larger the threshold the higher the value of overlap TODO
 	double ** y;			//weighted string
 	unsigned int n;			//length of y
-
 	clock_t start;
 	clock_t finish;
-
 	string line;
 	int lineCounter;
-
 	vector<Read> leftVector;
 	vector<Read> rightVector;
-
-	string left_sequenceID;
 	string left_sequence;
 	string left_score;
-
-	string right_sequenceID;
 	string right_sequence;
 	string right_score;
 
@@ -50,17 +42,16 @@ int main (int argc, char **argv)
 		{
 			switch (lineCounter%4)
 			{
-			  case 0: left_sequenceID = line; break;
-			  case 1: left_sequence = line; break;
-			  case 3:
-			  {
+			case 1: left_sequence = line; break;
+			case 3:
+				{
 				  left_score = line;
 
 				  //Add to vector
 				  Read left_read(left_sequence,left_score);
 				  leftVector.push_back(left_read);
-			  } break;
-			  default: break;
+				} break;
+			default: break;
 			}
 			lineCounter++;
 		}
@@ -76,7 +67,6 @@ int main (int argc, char **argv)
 		{
 			switch (lineCounter%4)
 			{
-			  case 0: right_sequenceID = line; break;
 			  case 1: right_sequence = line; break;
 			  case 3:
 			  {
@@ -93,94 +83,80 @@ int main (int argc, char **argv)
 		right_file.close();
 	}
 
-	stringstream output;
+	//Create output file
+	ofstream file;
+	file.open("output.txt");
+	file.close();
+
+	start = clock();
 	for(unsigned int vi = 0; vi < leftVector.size() && vi < rightVector.size();vi++)
 	{
 		ProbabilityMatrix resultingMatrix(
-				rightVector.at(vi).getSequence()+
+				rightVector.at(vi).getSequence()+"N"+
 				leftVector.at(vi).getSequence(),
-				rightVector.at(vi).getScore()+
-				leftVector.at(vi).getScore());
-
-		start = clock();
+				rightVector.at(vi).getScore()+"!"+
+				leftVector.at(vi).getScore(),rightVector.at(vi).size());
 
 		resultingMatrix.applyBigram(401); // window size 401
-		resultingMatrix.applyQualityScore(1); // QS:BiGram = 100:1
+		resultingMatrix.applyQualityScore(100); // QS:BiGram = 100:1
 
-		cout<<resultingMatrix.getSequence()<<"\n";
-		cout<<resultingMatrix.getScore()<<"\n";
-		resultingMatrix.printMatrix();
-
+		string empty;
 		n = resultingMatrix.getSize();
 		y = resultingMatrix.getMatrix();
 
-		string empty;
-		unsigned int * borderArray;
 		if ( ! ( preparation ( empty, y, n, z, alphabet, mod ) ) )
 		{
 			return 0;
 		}
+		//TODO ADD NORMAL PREFIX TABLE
 		else
 		{
-			for ( unsigned int i = 0; i < n; i++ )
-				delete[] y[i];
-			delete[] y;
-			unsigned int * WP = new unsigned int [n];
-			wptable ( sigma, z, WP );
+			unsigned int * WPT = new unsigned int [n];
+			wptable ( sigma, z, WPT );
 
-			borderArray = new unsigned int[n];
-			borderArray = computerBorderArray(WP, n);
-
-			finish = clock();
-			double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
-			cout << "Elapsed time is " << passtime << endl;
+			unsigned int * BT = (unsigned int *) calloc(n, sizeof(unsigned int));
+			borderTable ( WPT, n, BT );
 
 			/*print*/
-			cout << "Weighted Prefix Table:\n";
+			cout<<resultingMatrix.getSequence()<<endl;
+			cout<<resultingMatrix.getScore()<<endl;
+			cout << "Weighted Prefix Table:"<<endl;
 			for ( unsigned int i = 0; i < n; i++ )
 			{
-				cout << WP[i] << ' ';
+				cout << WPT[i] << ' ';
 			}
-
-			cout << "\nWeighted Border Table:\n";
+			cout << "\nWeighted Border Table:"<<endl;
 			for(int r = 0; r<n;r++)
 			{
-				cout<<borderArray[r]<<" ";
+				cout<<BT[r]<<" ";
 			}
-			cout<<endl;
+			resultingMatrix.printMatrix();
+
+			int shortestReadLength = min(rightVector.at(vi).size(), leftVector.at(vi).size());
+			int overlap = BT[n-1];
+			if(shortestReadLength<overlap) {
+				cout<<"Overlap specified by border larger then read size"<<endl;
+				return 1;
+//				overlap = borderArray[leftVector.at(vi).getSize()-1+temp-rightVector.at(vi).getSize()];
+
+			}
+			string joinedString = resultingMatrix.getSequence().substr(rightVector.at(vi).size()+1)+
+					resultingMatrix.getSequence().substr(overlap,leftVector.at(vi).size()-overlap);
+			cout<<joinedString<<endl<<endl;
+
+			//Write to file
+			ofstream file;
+			file.open("output.txt", fstream::out | fstream::app);
+			file<<joinedString+"\n";
+			file.close();
+
+			//Clean up
+			delete[] WPT;
+			delete[] BT;
 		}
-
-		int shortestReadLength = min(rightVector.at(vi).getSize(), leftVector.at(vi).getSize());
-		int overlap = borderArray[n-1];
-		if(shortestReadLength<overlap)
-		{
-			int window;
-			for(int i = 0; i < shortestReadLength; i++)
-			{
-				window = leftVector.at(vi).getSize()-i;
-				if(leftVector.at(vi).getSequence().substr(leftVector.at(vi).getSize()-window,window)==rightVector.at(vi).getSequence().substr(0,window))
-					break;
-			}
-			overlap = 0;
-			for(int k = 0; k<window;k++)
-			{
-				double averageOfScoreValues = (1-pow(10.0,(33.0-((double)((int)(leftVector.at(vi).getScore()[leftVector.at(vi).getSize()-1-k]))))/10.0) +
-						1-pow(10.0,(33.0-((double)((int)(leftVector.at(vi).getScore()[k]))))/10.0)) / 2;
-				if(averageOfScoreValues > 1.0-1/z1)
-					overlap++;
-			}
-		}
-
-		string joinedString = resultingMatrix.getSequence().substr(rightVector.at(vi).getSize())+
-				resultingMatrix.getSequence().substr(overlap,rightVector.at(vi).getSize());
-		cout<< joinedString<<endl;
-
-		output<<joinedString+"\n";
-		cout<<endl;
 	}
-	ofstream file;
-	file.open("output.txt");
-	file<<output.str();
-	file.close();
+	finish = clock();
+	double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
+	cout << "\nElapsed time is " << passtime << endl;
 	return 0;
 }

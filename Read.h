@@ -21,7 +21,7 @@ public:
 	virtual ~Read();
 	string getSequence();
 	string getScore();
-	int getSize();
+	int size();
 	void calculateReadInverse();
 };
 

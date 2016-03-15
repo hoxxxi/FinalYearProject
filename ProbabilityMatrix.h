@@ -17,13 +17,14 @@
 using namespace std;
 
 class ProbabilityMatrix {
+	int splitPoint;
 	string sequence;
 	string score;
 	int size;
 	double** matrix;
 	map<char, int> baseMapping;
 public:
-	ProbabilityMatrix(string sequenceIn, string scoreIn);
+	ProbabilityMatrix(string sequenceIn, string scoreIn, int splitPoint);
 	virtual ~ProbabilityMatrix();
 	string getSequence();
 	string getScore();

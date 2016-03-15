@@ -13,7 +13,7 @@ Read::Read(string sequenceIn, string scoreIn) {
 }
 
 Read::~Read() {
-	// TODO Auto-generated destructor stub
+
 }
 
 string Read::getSequence() {
@@ -24,7 +24,7 @@ string Read::getScore() {
 	return score;
 }
 
-int Read::getSize() {
+int Read::size() {
 	return sequence.size();
 }
 void Read::calculateReadInverse() {
