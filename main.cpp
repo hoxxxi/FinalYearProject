@@ -20,8 +20,6 @@ int main (int argc, char **argv)
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
 	double z = 20; //The larger the threshold the higher the value of overlap TODO
-	double ** y;			//weighted string
-	unsigned int n;			//length of y
 	clock_t start;
 	clock_t finish;
 
@@ -67,39 +65,42 @@ int main (int argc, char **argv)
 					resultingMatrix.applyQualityScore(100); // QS:BiGram = 100:1
 
 					string empty;
-					n = resultingMatrix.getSize();
-					y = resultingMatrix.getMatrix();
-
-					if ( ! ( preparation ( empty, y, n, z, alphabet, mod ) ) )
+					if ( ! ( preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod ) ) )
 					{
 						return 0;
 					}
 					//TODO ADD NORMAL PREFIX TABLE
 					else
 					{
-						unsigned int * WPT = new unsigned int [n];
+						unsigned int * WPT = new unsigned int [resultingMatrix.getSize()];
 						wptable ( sigma, z, WPT );
 
-						unsigned int * BT = (unsigned int *) calloc(n, sizeof(unsigned int));
-						borderTable ( WPT, n, BT );
+						unsigned int * BT = (unsigned int *) calloc(resultingMatrix.getSize(), sizeof(unsigned int));
+						borderTable ( WPT, resultingMatrix.getSize(), BT );
 
 						/*print*/
+//						cout<<"Read No. "<< lineCounter/4<<endl;
 //						cout<<resultingMatrix.getSequence()<<endl;
 //						cout<<resultingMatrix.getScore()<<endl;
 //						cout << "Weighted Prefix Table:"<<endl;
-//						for ( unsigned int i = 0; i < n; i++ )
+//						for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
 //						{
 //							cout << WPT[i] << ' ';
 //						}
 //						cout << "\nWeighted Border Table:"<<endl;
-//						for(int r = 0; r<n;r++)
+//						for(int r = 0; r<resultingMatrix.getSize();r++)
 //						{
 //							cout<<BT[r]<<" ";
 //						}
 //						resultingMatrix.printMatrix();
 
 						int shortestReadLength = min(right_read.size(), left_read.size());
-						int overlap = BT[n-1];
+						int overlap = BT[resultingMatrix.getSize()-1];
+
+						//Clean up
+						delete[] WPT;
+						delete[] BT;
+
 						if(shortestReadLength<overlap) {
 							cout<<"Overlap specified by border larger then read size"<<endl;
 							return 1;
@@ -108,18 +109,15 @@ int main (int argc, char **argv)
 						}
 						string joinedString = resultingMatrix.getSequence().substr(right_read.size()+1)+
 								resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
-//						cout<<"Row: "<<lineCounter/4<<endl;
 
 						//Write to file
 						ofstream file;
 						file.open("output.txt", fstream::out | fstream::app);
 						file<<joinedString+"\n";
 						file.close();
-
-						//Clean up
-						delete[] WPT;
-						delete[] BT;
 					}
+//					cout<<"Left Line "<<leftLine<<endl;
+//					cout<<"Right Line "<<rightLine<<endl;
 				} break;
 			default: break;
 			}
