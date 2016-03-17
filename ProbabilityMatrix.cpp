@@ -25,6 +25,7 @@ ProbabilityMatrix::~ProbabilityMatrix() {
 	for ( unsigned int i = 0; i < size; i++ )
 		delete[] matrix[i];
 	delete[] matrix;
+	cout<<"Prob Matrix destroyed: "<<sequence<<endl;
 }
 string ProbabilityMatrix::getSequence() {
 	return sequence;
