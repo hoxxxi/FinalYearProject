@@ -115,7 +115,7 @@ int main (int argc, char **argv)
 
 					//Clean up
 					delete[] PT;
-					delete[] BT;
+					free (BT);
 				} break;
 			default: break;
 			}
