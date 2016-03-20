@@ -20,7 +20,7 @@ struct TSwitch
 
 #ifndef WSTR_H
 #define WSTR_H
-struct WStr 
+struct WStr
 {
 	vector < int > str;
 	vector < double > prob;
@@ -34,9 +34,9 @@ struct WStr
 #endif
 
 #ifndef FACTOR_H
-#define FACTOR_H 
+#define FACTOR_H
 struct Factor
-{	
+{
 	unsigned int start;
 	unsigned int end;
 	unsigned int l;

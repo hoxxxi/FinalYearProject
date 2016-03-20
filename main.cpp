@@ -19,12 +19,12 @@ int main (int argc, char **argv)
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	double z = 20; //The larger the threshold the higher the value of overlap TODO
+	double z = 2;
 	clock_t start;
 	clock_t finish;
 
-	ifstream left_file ("/home/yordan/Desktop/frag_1.fastq", ios::in);
-	ifstream right_file ("/home/yordan/Desktop/frag_2.fastq", ios::in);
+	ifstream left_file ("/home/yordan/Desktop/left.fastq", ios::in); // /home/yordan/Desktop/
+	ifstream right_file ("/home/yordan/Desktop/right.fastq", ios::in);
 
 	ofstream file;
 	file.open("output.txt");
@@ -67,58 +67,56 @@ int main (int argc, char **argv)
 					string empty;
 					if ( ! ( preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod ) ) )
 					{
-						return 0;
+						return 0;//TODO ADD NORMAL PREFIX TABLE
 					}
-//					//TODO ADD NORMAL PREFIX TABLE
-//					else
-//					{
-//						unsigned int * WPT = new unsigned int [resultingMatrix.getSize()];
-//						wptable ( sigma, z, WPT );
-//
-//						unsigned int * BT = (unsigned int *) calloc(resultingMatrix.getSize(), sizeof(unsigned int));
-//						borderTable ( WPT, resultingMatrix.getSize(), BT );
-//
-//						/*print*/
-//						cout<<"Read No. "<< lineCounter/4<<endl;
-//						cout<<resultingMatrix.getSequence()<<endl;
-//						cout<<resultingMatrix.getScore()<<endl;
-//						cout << "Weighted Prefix Table:"<<endl;
-//						for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
-//						{
-//							cout << WPT[i] << ' ';
-//						}
-//						cout << "\nWeighted Border Table:"<<endl;
-//						for(int r = 0; r<resultingMatrix.getSize();r++)
-//						{
-//							cout<<BT[r]<<" ";
-//						}
-//						resultingMatrix.printMatrix();
-//
-//						int shortestReadLength = min(right_read.size(), left_read.size());
-//						int overlap = BT[resultingMatrix.getSize()-1];
-//
-//						//Clean up
-//						delete[] WPT;
-//						delete[] BT;
-//
-//						if(shortestReadLength<overlap) {
-//							cout<<"Overlap specified by border larger then read size"<<endl;
-//							return 1;
-//			//				overlap = borderArray[leftVector.at(vi).getSize()-1+temp-rightVector.at(vi).getSize()];
-//
-//						}
-					int overlap = 0;
-					string joinedString = resultingMatrix.getSequence().substr(right_read.size()+1)+
-							resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
+					else
+					{
+						unsigned int * WPT = new unsigned int [resultingMatrix.getSize()];
+						wptable ( sigma, z, WPT );
 
-					//Write to file
-					ofstream file;
-					file.open("output.txt", fstream::out | fstream::app);
-					file<<joinedString+"\n";
-					file.close();
-//					}
-//					cout<<"Left Line "<<leftLine<<endl;
-//					cout<<"Right Line "<<rightLine<<endl;
+						unsigned int * BT = (unsigned int *) calloc(resultingMatrix.getSize(), sizeof(unsigned int));
+						borderTable ( WPT, resultingMatrix.getSize(), BT );
+
+						/*print*/
+						cout<<"Read No. "<< lineCounter/4<<endl;
+						cout<<resultingMatrix.getSequence()<<endl;
+						cout<<resultingMatrix.getScore()<<endl;
+						cout << "Weighted Prefix Table:"<<endl;
+						for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
+						{
+							cout << WPT[i] << ' ';
+						}
+						cout << "\nWeighted Border Table:"<<endl;
+						for(int r = 0; r<resultingMatrix.getSize();r++)
+						{
+							cout<<BT[r]<<" ";
+						}
+						resultingMatrix.printMatrix();
+
+						int shortestReadLength = min(right_read.size(), left_read.size());
+						int overlap = BT[resultingMatrix.getSize()-1];
+
+						//Clean up
+						delete[] WPT;
+						delete[] BT;
+
+						if(shortestReadLength<overlap) {
+							cout<<"Overlap specified by border larger then read size"<<endl;
+							return 1;
+//							overlap = borderArray[leftVector.at(vi).getSize()-1+temp-rightVector.at(vi).getSize()];
+						}
+
+
+
+						string joinedString = resultingMatrix.getSequence().substr(right_read.size()+1)+
+								resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
+
+						//Write to file
+						ofstream file;
+						file.open("output.txt", fstream::out | fstream::app);
+						file<<joinedString+"\n";
+						file.close();
+					}
 				} break;
 			default: break;
 			}
