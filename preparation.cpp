@@ -102,9 +102,6 @@ unsigned int preparation ( string x, double ** y, unsigned int n, double z, stri
 	delete[] pxx;
 	delete[] yy;
 	delete[] pyy;
-//	for ( unsigned int i = 0; i < n; i++ )
-//		delete[] y[i];
-//	delete[] y;
 
 	N = xy.str.size();
 
@@ -128,8 +125,7 @@ unsigned int preparation ( string x, double ** y, unsigned int n, double z, stri
 
 	if ( bpos.size() == 0 )
 	{
-		cout << "No Black Positions in The Weighted String" << endl;
-		return 0;
+		return 1; // No Black Positions in The Weighted String
 	}
 
 	/* Computing BP array */
@@ -191,8 +187,7 @@ unsigned int preparation ( string x, double ** y, unsigned int n, double z, stri
 			xy.FP.push_back ( fp );
 		}
 	}
-
-	return 1;
+	return 0;
 }
 
 

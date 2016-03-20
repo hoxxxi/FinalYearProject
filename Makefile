@@ -8,9 +8,9 @@ LFLAGS= -std=c++11 -O3 -DNDEBUG -I ./libsdsl/include/ -L ./libsdsl/lib/ -lsdsl -
 
 EXE=    wpt 
  
-SRC=    main.cpp input.cpp matching.cpp preparation.cpp parray.cpp wptable.cpp drittel.cpp lcve.cpp operate.cpp Read.cpp ProbabilityMatrix.cpp BorderTable.cpp
+SRC=    main.cpp input.cpp matching.cpp preparation.cpp parray.cpp wptable.cpp drittel.cpp lcve.cpp operate.cpp Read.cpp ProbabilityMatrix.cpp BorderTable.cpp PrefixTable.cpp
  
-HD=     global.h defs.h util.h Read.h ProbabilityMatrix.h BorderTable.h  Makefile
+HD=     global.h defs.h util.h Read.h ProbabilityMatrix.h BorderTable.h PrefixTable.h Makefile
  
 # 
 # No need to edit below this line 

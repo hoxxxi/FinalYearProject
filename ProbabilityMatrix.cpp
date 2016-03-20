@@ -115,10 +115,10 @@ void ProbabilityMatrix::applyBigram(int windowSize)
 	}
 
 	//Clear split point
-	matrix[splitPoint][baseMapping['A']]=0.25;
-	matrix[splitPoint][baseMapping['C']]=0.25;
-	matrix[splitPoint][baseMapping['G']]=0.25;
-	matrix[splitPoint][baseMapping['T']]=0.25;
+//	matrix[splitPoint][baseMapping['A']]=0.25;
+//	matrix[splitPoint][baseMapping['C']]=0.25;
+//	matrix[splitPoint][baseMapping['G']]=0.25;
+//	matrix[splitPoint][baseMapping['T']]=0.25;
 
 	//Chargaff's rule
 	matrix[0][baseMapping['A']]=0.292;
@@ -126,10 +126,10 @@ void ProbabilityMatrix::applyBigram(int windowSize)
 	matrix[0][baseMapping['G']]=0.201;
 	matrix[0][baseMapping['T']]=0.301;
 
-	matrix[splitPoint+1][baseMapping['A']]=0.292;
-	matrix[splitPoint+1][baseMapping['C']]=0.206;
-	matrix[splitPoint+1][baseMapping['G']]=0.201;
-	matrix[splitPoint+1][baseMapping['T']]=0.301;
+//	matrix[splitPoint+1][baseMapping['A']]=0.292;
+//	matrix[splitPoint+1][baseMapping['C']]=0.206;
+//	matrix[splitPoint+1][baseMapping['G']]=0.201;
+//	matrix[splitPoint+1][baseMapping['T']]=0.301;
 }
 
 void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
@@ -170,9 +170,9 @@ void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
 	}
 
 	//Clear split point
-	sequence[splitPoint] = '$';
-	matrix[splitPoint][baseMapping['A']]=0;
-	matrix[splitPoint][baseMapping['C']]=0;
-	matrix[splitPoint][baseMapping['G']]=0;
-	matrix[splitPoint][baseMapping['T']]=0;
+//	sequence[splitPoint] = '$';
+//	matrix[splitPoint][baseMapping['A']]=0;
+//	matrix[splitPoint][baseMapping['C']]=0;
+//	matrix[splitPoint][baseMapping['G']]=0;
+//	matrix[splitPoint][baseMapping['T']]=0;
 }
