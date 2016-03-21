@@ -20,7 +20,7 @@ int main (int argc, char **argv)
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	double z = 100;
+	double z = 1;
 	clock_t start;
 	clock_t finish;
 
@@ -73,15 +73,17 @@ int main (int argc, char **argv)
 					if ( preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod ) ==  0 )
 					{
 						wptable ( sigma, z, PT ); // Weighted Prefix Table
+cout<< "\nweighed table\n";
 					}
 					else
 					{
 						calculatePrefixTable(resultingMatrix.getSequence(),resultingMatrix.getSize(), PT); // Normal Prefix Table
+cout<< "\nnormal table\n";
 					}
 					borderTable ( PT, resultingMatrix.getSize(), BT );
 
 					/*print*/
-					cout<<"Read No. "<< (lineCounter/4)+1 <<endl;
+					cout<<"Read No. "<< (lineCounter/4)+1 <<endl;/*
 					cout<<resultingMatrix.getSequence()<<endl;
 					cout<<resultingMatrix.getScore()<<endl;
 					cout << "Weighted Prefix Table:"<<endl;
@@ -94,7 +96,7 @@ int main (int argc, char **argv)
 					{
 						cout<<BT[r]<<" ";
 					}
-					resultingMatrix.printMatrix();
+					resultingMatrix.printMatrix();*/
 
 					int shortestReadLength = min(right_read.size(), left_read.size());
 					int overlap = BT[resultingMatrix.getSize()-1];
