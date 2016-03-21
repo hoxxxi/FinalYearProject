@@ -9,8 +9,8 @@ using namespace std;
 #define TSWITCH_H
 struct TSwitch
 {
-	string	weighted_str_filename;
-	string	solid_str_filename;
+	string	left_filename;
+	string	right_filename;
 	string	output_filename;
 	double	z;
 	string	alphabet;

@@ -17,21 +17,71 @@ using namespace std;
 
 int main (int argc, char **argv)
 {
+	TSwitch sw;
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
+	string left_file = "./data/left.fastq";
+	string right_file = "./data/right.fastq";
+	string output = "output.txt";
 	double z = 10;
 	clock_t start;
 	clock_t finish;
 
-	ifstream left_file ("./data/left.fastq", ios::in); // /home/yordan/Desktop/
-	ifstream right_file ("./data/right.fastq", ios::in);
+#if 1
+	/* Decodes the arguments */
+	unsigned int k = decode_switches ( argc, argv, &sw );
+
+	/* Check the arguments */
+	if ( k < 9 )
+	{
+
+		usage();
+		return 1;
+	}
+	else
+	{
+		if ( sw.left_filename.size() == 0 )
+		{
+			cout << "Error: No left FASTQ input!" << endl;
+			return 0;
+		}
+		else
+		{
+			left_file = sw.left_filename;
+		}
+
+		if ( sw.right_filename.size() == 0)
+		{
+			cout << "Error: No right FASTQ input!" << endl;
+			return 0;
+		}
+		else
+		{
+			right_file = sw.right_filename;
+		}
+
+		if ( sw.output_filename.size() == 0 )
+		{
+			cout << "Error: Specify output file!" << endl;
+		}
+		else
+		{
+			output = sw.output_filename;
+		}
+
+		z = sw.z;
+	}
+#endif
+
+	ifstream leftFileStream (left_file, ios::in); // /home/yordan/Desktop/
+	ifstream rightFileStream (right_file, ios::in);
 
 	ofstream file;
-	file.open("output.txt");
+	file.open(output.c_str());
 	file.close();
 	
-	if (left_file.is_open() && right_file.is_open())
+	if (leftFileStream.is_open() && rightFileStream.is_open())
 	{
 		string leftLine;
 		string rightLine;
@@ -41,7 +91,7 @@ int main (int argc, char **argv)
 		string right_sequence;
 		string right_score;
 		start = clock();
-		while (getline(left_file, leftLine) && getline(right_file, rightLine))
+		while (getline(leftFileStream, leftLine) && getline(rightFileStream, rightLine))
 		{
 			switch (lineCounter%4)
 			{
@@ -81,7 +131,7 @@ int main (int argc, char **argv)
 					borderTable ( PT, resultingMatrix.getSize(), BT );
 
 					/*print*/
-#if 1
+#if 0
 					cout<<"Read No. "<< (lineCounter/4)+1 <<endl;
 					cout<<resultingMatrix.getSequence()<<endl;
 					cout<<resultingMatrix.getScore()<<endl;
@@ -110,7 +160,7 @@ int main (int argc, char **argv)
 
 					//Write to file
 					ofstream file;
-					file.open("output.txt", fstream::out | fstream::app);
+					file.open(output.c_str(), fstream::out | fstream::app);
 					file<<joinedString+"\n";
 					file.close();
 
@@ -123,8 +173,8 @@ int main (int argc, char **argv)
 			}
 			lineCounter++;
 		}
-		left_file.close();
-		right_file.close();
+		leftFileStream.close();
+		rightFileStream.close();
 	}
 
 	finish = clock();
