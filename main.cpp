@@ -17,10 +17,12 @@ using namespace std;
 
 int main (int argc, char **argv)
 {
+	for(int zValue = 10; zValue< 100; zValue++){
+		cout<<"\nTreshhold: "<<zValue<<endl;
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	double z = 100;
+	double z = zValue;
 	clock_t start;
 	clock_t finish;
 
@@ -70,48 +72,61 @@ int main (int argc, char **argv)
 					unsigned int * PT = new unsigned int [resultingMatrix.getSize()];
 					unsigned int * BT = (unsigned int *) calloc(resultingMatrix.getSize(), sizeof(unsigned int));
 
-					if ( preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod ) ==  0 )
-					{
-						wptable ( sigma, z, PT ); // Weighted Prefix Table
-					}
-					else
-					{
-						calculatePrefixTable(resultingMatrix.getSequence(),resultingMatrix.getSize(), PT); // Normal Prefix Table
-					}
-					borderTable ( PT, resultingMatrix.getSize(), BT );
+
+					preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod );
 
 					/*print*/
-					cout<<"Read No. "<< (lineCounter/4)+1 <<endl;
-					cout<<resultingMatrix.getSequence()<<endl;
-					cout<<resultingMatrix.getScore()<<endl;
-					cout << "Weighted Prefix Table:"<<endl;
-					for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
-					{
-						cout << PT[i] << ' ';
-					}
-					cout << "\nWeighted Border Table:"<<endl;
+					cout<<"\n\nRead No. "<< (lineCounter/4)+1 <<endl;
+//					cout<<resultingMatrix.getSequence().substr(right_sequence.size())+"\t"+resultingMatrix.getSequence().substr(0,left_sequence.size())<<endl;
+
+					wptable ( sigma, z, PT ); // Weighted Prefix Table
+					borderTable ( PT, resultingMatrix.getSize(), BT );
+
+//					cout << "Weighted Prefix Table:"<<endl;
+//					for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
+//					{
+//						cout << PT[i] << ' ';
+//					}
+					cout << "Weighted Border Table:"<<endl;
 					for(int r = 0; r<resultingMatrix.getSize();r++)
 					{
 						cout<<BT[r]<<" ";
 					}
-					resultingMatrix.printMatrix();
 
-					int shortestReadLength = min(right_read.size(), left_read.size());
-					int overlap = BT[resultingMatrix.getSize()-1];
+					//Clean up
+					delete[] PT;
+					free (BT);
+					PT = new unsigned int [resultingMatrix.getSize()];
+					BT = (unsigned int *) calloc(resultingMatrix.getSize(), sizeof(unsigned int));
+					calculatePrefixTable(resultingMatrix.getSequence(),resultingMatrix.getSize(), PT); // Normal Prefix Table
+					borderTable ( PT, resultingMatrix.getSize(), BT );
 
-					while(shortestReadLength<overlap) {
-						overlap = BT[overlap-1]; // Get the border of the border
-					}
+//					cout << "\nNormal Prefix Table:"<<endl;
+//					for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
+//					{
+//						cout << PT[i] << ' ';
+//					}
+//					cout << "\nNormal Border Table:"<<endl;
+//					for(int r = 0; r<resultingMatrix.getSize();r++)
+//					{
+//						cout<<BT[r]<<" ";
+//					}
 
-					string joinedString = resultingMatrix.getSequence().substr(right_read.size())+
-							resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
-
-					//Write to file
-					ofstream file;
-					file.open("output.txt", fstream::out | fstream::app);
-					file<<joinedString+"\n";
-					file.close();
-
+//					int shortestReadLength = min(right_read.size(), left_read.size());
+//					int overlap = BT[resultingMatrix.getSize()-1];
+//
+//					while(shortestReadLength<overlap) {
+//						overlap = BT[overlap-1]; // Get the border of the border
+//					}
+//
+//					string joinedString = resultingMatrix.getSequence().substr(right_read.size())+
+//							resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
+//
+//					//Write to file
+//					ofstream file;
+//					file.open("output.txt", fstream::out | fstream::app);
+//					file<<joinedString+"\n";
+//					file.close();
 
 					//Clean up
 					delete[] PT;
@@ -127,6 +142,6 @@ int main (int argc, char **argv)
 
 	finish = clock();
 	double passtime = (	double ) ( finish - start ) / CLOCKS_PER_SEC;
-	cout << "\nElapsed time is " << passtime << endl;
+	cout << "\n\nElapsed time is " << passtime << endl;}
 	return 0;
 }

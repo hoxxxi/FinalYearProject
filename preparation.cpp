@@ -125,8 +125,11 @@ unsigned int preparation ( string x, double ** y, unsigned int n, double z, stri
 
 	if ( bpos.size() == 0 )
 	{
-		return 1; // No Black Positions in The Weighted String
+		cout<<"No Black Positions in The Weighted String"<<endl;
+//		return 1; // No Black Positions in The Weighted String
 	}
+	else
+//		cout<<"Using Weighted String"<<endl;
 
 	/* Computing BP array */
 	xy.BP.reserve ( n );
