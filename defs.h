@@ -30,6 +30,7 @@ struct WStr
 	vector < double > FP;
 	unsigned int ul;
 	unsigned int lvp;
+	virtual ~WStr();
 };
 #endif
 

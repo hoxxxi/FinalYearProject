@@ -156,6 +156,7 @@ unsigned int wptable ( int m, double z , unsigned int * WP )
 	}
 
 	delete [] Parray;
+	xy.~WStr();
 
 	return 1;
 }

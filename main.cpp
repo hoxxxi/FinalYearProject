@@ -20,12 +20,12 @@ int main (int argc, char **argv)
 	string alphabet = DNA;
 	unsigned int sigma = alphabet.size();
 	int mod = 0;
-	double z = 100;
+	double z = 10;
 	clock_t start;
 	clock_t finish;
 
-	ifstream left_file ("left.fastq", ios::in); // /home/yordan/Desktop/
-	ifstream right_file ("right.fastq", ios::in);
+	ifstream left_file ("./data/left.fastq", ios::in); // /home/yordan/Desktop/
+	ifstream right_file ("./data/right.fastq", ios::in);
 
 	ofstream file;
 	file.open("output.txt");
@@ -81,6 +81,7 @@ int main (int argc, char **argv)
 					borderTable ( PT, resultingMatrix.getSize(), BT );
 
 					/*print*/
+#if 1
 					cout<<"Read No. "<< (lineCounter/4)+1 <<endl;
 					cout<<resultingMatrix.getSequence()<<endl;
 					cout<<resultingMatrix.getScore()<<endl;
@@ -95,6 +96,7 @@ int main (int argc, char **argv)
 						cout<<BT[r]<<" ";
 					}
 					resultingMatrix.printMatrix();
+#endif
 
 					int shortestReadLength = min(right_read.size(), left_read.size());
 					int overlap = BT[resultingMatrix.getSize()-1];
