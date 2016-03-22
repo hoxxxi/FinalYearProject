@@ -68,10 +68,10 @@ int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
 void usage ( void )
 {
 	cout << "Please provide appropriate arguments:"  << endl;
-	cout << "	-l, --weighted-string\t<str>\tFilename for Weight String." << endl;
-	cout << "	-r, --solid-string\t<str>\tFilename for Solid String." << endl;
+	cout << "	-l, --weighted-string\t<str>\tFilename for Left FASTQ String." << endl;
+	cout << "	-r, --solid-string\t<str>\tFilename for Right FASTQ String." << endl;
 	cout << "	-o, --output-file\t<str>\tFilename for result output." << endl;
-	cout << "	-z, --cumulative-threshold\t<dbl>\tcumulative weight threshold."<<endl;
+	cout << "	-z, --cumulative-threshold\t<dbl>\tCumulative weight threshold."<<endl;
 	cout << "	-h, --help\t<dbl>\tHelp!"<<endl;
 }
 
