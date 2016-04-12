@@ -154,7 +154,7 @@ void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
 			else {
 				matrix[i][k] = (temp+(qsCoefficient*notValue/3.0))/(qsCoefficient+1.0);
 			}
-			if(matrix[i][k]>=maxProb)
+			if(matrix[i][k]>maxProb && matrix[i][k]>0.25)
 			{
 				maxProb = matrix[i][k];
 				switch(k)
