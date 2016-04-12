@@ -12,6 +12,7 @@ struct TSwitch
 	string	left_filename;
 	string	right_filename;
 	string	output_filename;
+	double	x;
 	double	z;
 	string	alphabet;
 	int		mod;

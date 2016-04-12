@@ -24,6 +24,7 @@ int main (int argc, char **argv)
 	string left_file = "./data/left.fastq";
 	string right_file = "./data/right.fastq";
 	string output = "output.txt";
+	double x = 10;
 	double z = 10;
 	clock_t start;
 	clock_t finish;
@@ -33,9 +34,8 @@ int main (int argc, char **argv)
 	unsigned int k = decode_switches ( argc, argv, &sw );
 
 	/* Check the arguments */
-	if ( k < 9 )
+	if ( k < 11 )
 	{
-
 		usage();
 		return 1;
 	}
@@ -71,6 +71,7 @@ int main (int argc, char **argv)
 		}
 
 		z = sw.z;
+		x = sw.x;
 	}
 #endif
 
@@ -90,11 +91,13 @@ int main (int argc, char **argv)
 		string left_score;
 		string right_sequence;
 		string right_score;
+		string lineLabel;
 		start = clock();
 		while (getline(leftFileStream, leftLine) && getline(rightFileStream, rightLine))
 		{
 			switch (lineCounter%4)
 			{
+			case 0: lineLabel = leftLine.substr(1,leftLine.size()-3); break;
 			case 1: left_sequence = leftLine; right_sequence = rightLine; break;
 			case 3:
 				{
@@ -132,7 +135,7 @@ int main (int argc, char **argv)
 
 					/*print*/
 #if 0
-					cout<<"Read No. "<< (lineCounter/4)+1 <<endl;
+					cout<<"Read No. "<< (lineCounter/4)+1 <<" with label: "<<lineLabel<<endl;
 					cout<<resultingMatrix.getSequence()<<endl;
 					cout<<resultingMatrix.getScore()<<endl;
 					cout << "Weighted Prefix Table:"<<endl;
@@ -159,12 +162,13 @@ int main (int argc, char **argv)
 							resultingMatrix.getSequence().substr(overlap,left_read.size()-overlap);
 
 					//Write to file
-					ofstream file;
-					file.open(output.c_str(), fstream::out | fstream::app);
-					file<<joinedString+"\n";
-					file.close();
-
-
+					if(((double) overlap)/((double)shortestReadLength)>=((double)x/100.0)){
+						ofstream file;
+						file.open(output.c_str(), fstream::out | fstream::app);
+						file<<">"+lineLabel+"\n"+joinedString+"\n";
+						file.close();
+//						cout<<overlap<<"\t"<<shortestReadLength<<"\t"<<(double) overlap/shortestReadLength<<endl;
+					}
 					//Clean up
 					delete[] PT;
 					free (BT);
