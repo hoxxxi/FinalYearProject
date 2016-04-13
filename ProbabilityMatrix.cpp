@@ -66,70 +66,75 @@ void ProbabilityMatrix::setZeroMatrix() {
 
 void ProbabilityMatrix::applyBigram(int windowSize)
 {
-	windowSize = (windowSize-1)/2;
+	if(windowSize>0){
+		windowSize = (windowSize-1)/2;
 
-	for(int currentPosition = 1; currentPosition < size; currentPosition++)
-	{
-		//Adjust window
-		int start = 0;
-		int end = size-1;
-		if(!(windowSize*2+1>size))
+		for(int currentPosition = 1; currentPosition < size; currentPosition++)
 		{
-			int windowPrefix = windowSize;
-			int windowSuffix = windowSize;
-
-			if(currentPosition-windowSize<0)
+			//Adjust window
+			int start = 0;
+			int end = size-1;
+			if(!(windowSize*2+1>size))
 			{
-				windowPrefix-=windowSize-currentPosition;
-				windowSuffix+=windowSize-currentPosition;
+				int windowPrefix = windowSize;
+				int windowSuffix = windowSize;
+
+				if(currentPosition-windowSize<0)
+				{
+					windowPrefix-=windowSize-currentPosition;
+					windowSuffix+=windowSize-currentPosition;
+				}
+				else if(currentPosition+windowSize>=size)
+				{
+					windowSuffix-=windowSize-(sequence.length()-1-currentPosition);
+					windowPrefix+=windowSize-windowSuffix;
+
+				}
+
+				start = currentPosition-windowPrefix;
+				end = currentPosition+windowSuffix;
 			}
-			else if(currentPosition+windowSize>=size)
+			//Define combination counter for the window
+			int count[5][5]={};
+			for(int k = start;k<end;k++)
 			{
-				windowSuffix-=windowSize-(sequence.length()-1-currentPosition);
-				windowPrefix+=windowSize-windowSuffix;
-
+				++count[baseMapping[sequence[k]]][baseMapping[sequence[k+1]]];
 			}
+			//Check total count of possible combinations
+			double sum = 0;
+			for(int l = 0; l < 5; l++){
+				sum+= count[baseMapping[sequence[currentPosition-1]]][l];
+			}
+			matrix[currentPosition][baseMapping['A']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/sum +
+					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+			matrix[currentPosition][baseMapping['C']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/sum +
+					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+			matrix[currentPosition][baseMapping['G']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/sum +
+					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+			matrix[currentPosition][baseMapping['T']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum +
+					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+		}
 
-			start = currentPosition-windowPrefix;
-			end = currentPosition+windowSuffix;
-		}
-		//Define combination counter for the window
-		int count[5][5]={};
-		for(int k = start;k<end;k++)
-		{
-			++count[baseMapping[sequence[k]]][baseMapping[sequence[k+1]]];
-		}
-		//Check total count of possible combinations
-		double sum = 0;
-		for(int l = 0; l < 5; l++){
-			sum+= count[baseMapping[sequence[currentPosition-1]]][l];
-		}
-		matrix[currentPosition][baseMapping['A']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/sum +
-				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
-		matrix[currentPosition][baseMapping['C']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/sum +
-				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
-		matrix[currentPosition][baseMapping['G']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/sum +
-				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
-		matrix[currentPosition][baseMapping['T']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum +
-				((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+		//Clear split point
+		//	matrix[splitPoint][baseMapping['A']]=0.25;
+		//	matrix[splitPoint][baseMapping['C']]=0.25;
+		//	matrix[splitPoint][baseMapping['G']]=0.25;
+		//	matrix[splitPoint][baseMapping['T']]=0.25;
+
+		//Chargaff's rule
+		matrix[0][baseMapping['A']]=0.292;
+		matrix[0][baseMapping['C']]=0.206;
+		matrix[0][baseMapping['G']]=0.201;
+		matrix[0][baseMapping['T']]=0.301;
+
+		//	matrix[splitPoint+1][baseMapping['A']]=0.292;
+		//	matrix[splitPoint+1][baseMapping['C']]=0.206;
+		//	matrix[splitPoint+1][baseMapping['G']]=0.201;
+		//	matrix[splitPoint+1][baseMapping['T']]=0.301;
 	}
-
-	//Clear split point
-//	matrix[splitPoint][baseMapping['A']]=0.25;
-//	matrix[splitPoint][baseMapping['C']]=0.25;
-//	matrix[splitPoint][baseMapping['G']]=0.25;
-//	matrix[splitPoint][baseMapping['T']]=0.25;
-
-	//Chargaff's rule
-	matrix[0][baseMapping['A']]=0.292;
-	matrix[0][baseMapping['C']]=0.206;
-	matrix[0][baseMapping['G']]=0.201;
-	matrix[0][baseMapping['T']]=0.301;
-
-//	matrix[splitPoint+1][baseMapping['A']]=0.292;
-//	matrix[splitPoint+1][baseMapping['C']]=0.206;
-//	matrix[splitPoint+1][baseMapping['G']]=0.201;
-//	matrix[splitPoint+1][baseMapping['T']]=0.301;
+	else{
+		this->setZeroMatrix();
+	}
 }
 
 void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {

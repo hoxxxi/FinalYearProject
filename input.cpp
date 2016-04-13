@@ -7,12 +7,14 @@
 
 static struct option long_options[] =
 {
-	{ "right-string",			required_argument,	NULL,	'r' },
-	{ "left-string",			required_argument,	NULL,	'l' },
-	{ "output-file",			required_argument,	NULL,	'o' },
-	{ "cumulative-threshold",	required_argument,	NULL,	'z'	},
-	{ "exclude-read-threshold",	required_argument,	NULL,	'x'	},
-	{ "help",					0,					NULL,	'h' },
+	{ "right-string",				required_argument,	NULL,	'r' },
+	{ "left-string",				required_argument,	NULL,	'l' },
+	{ "output-file",				required_argument,	NULL,	'o' },
+	{ "cumulative-threshold",		required_argument,	NULL,	'z'	},
+	{ "exclude-read-threshold",		required_argument,	NULL,	'x'	},
+	{ "bigram-window",				required_argument,	NULL,	'w'	},
+	{ "quality-score-coefficient",	required_argument,	NULL,	'q'	},
+	{ "help",						0,					NULL,	'h' },
 };
 
 int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
@@ -27,7 +29,7 @@ int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
 
 	args_counter = 0;
 
-	while ( ( opt = getopt_long ( argc, argv, "r:l:o:z:x:h", long_options, NULL ) ) != -1 )
+	while ( ( opt = getopt_long ( argc, argv, "r:l:o:z:x:w:q:h", long_options, NULL ) ) != -1 )
 	{
 		switch ( opt )
 		{
@@ -61,12 +63,30 @@ int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
 				sw -> x = val;
 				args_counter ++;
 				break;
+			case 'w':
+				val = strtod ( optarg, &ep );
+				if ( optarg == ep )
+				{
+					return 0;
+				}
+				sw -> bigramWindow = val;
+				args_counter ++;
+				break;
+			case 'q':
+				val = strtod ( optarg, &ep );
+				if ( optarg == ep )
+				{
+					return 0;
+				}
+				sw -> qualityScoreCoefficient = val;
+				args_counter ++;
+				break;
 			case 'h':
 				return 0;
 		}
 	}
 
-	if ( args_counter != 5 )
+	if ( args_counter < 3 )
 	{
 		usage();
 		exit ( 1 );
@@ -78,12 +98,14 @@ int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
 void usage ( void )
 {
 	cout << "Please provide appropriate arguments:"  << endl;
-	cout << "	-l, --left-string\t<str>\tFilename for Left FASTQ String." << endl;
-	cout << "	-r, --right-string\t<str>\tFilename for Right FASTQ String." << endl;
-	cout << "	-o, --output-file\t<str>\tFilename for result output." << endl;
-	cout << "	-z, --cumulative-threshold\t<dbl>\tCumulative weight threshold."<<endl;
-	cout << "	-x, --exclude-read-threshold\t<dbl>\tExclude reads with insignificant overlap."<<endl;
-	cout << "	-h, --help\t<dbl>\tHelp!"<<endl;
+	cout << "	-l, --left-string\t\t<str>\tFilename for Left FASTQ String." << endl;
+	cout << "	-r, --right-string\t\t<str>\tFilename for Right FASTQ String." << endl;
+	cout << "	-o, --output-file\t\t<str>\tFilename for result output." << endl;
+	cout << "	-z, --cumulative-threshold\t<dbl>\tBy default set to 10. Cumulative weight threshold. The bigger the threshold, the higher the prefix table construction tolerance."<<endl;
+	cout << "	-x, --exclude-read-threshold\t<dbl>\tBy default set to 10. Exclude reads with insignificant overlap. Higher exculsion percentage generates fewer reads."<<endl;
+	cout << "	-q, --quality-score-coefficient\t<dbl>\tBy default set to 100. Coefficent of quality score : bigram probability distribution. To disregard quality score probability distribution set to 0."<<endl;
+	cout << "	-w, --bigram-window\t\t<dbl>\tBy default set to 400. Length of bigram window. To disregard bigram probability distribution set to 0."<<endl;
+	cout << "	-h, --help\t\t\tHelp!"<<endl;
 }
 
 

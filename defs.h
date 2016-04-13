@@ -16,6 +16,8 @@ struct TSwitch
 	double	z;
 	string	alphabet;
 	int		mod;
+	int bigramWindow;
+	int qualityScoreCoefficient;
 };
 #endif
 
