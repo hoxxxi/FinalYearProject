@@ -25,7 +25,10 @@ int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
 	int args_counter;
 
 	/* initialisation */
-	sw -> z						=	1;
+	sw -> z							=	10;
+	sw -> x							=	10;
+	sw -> bigramWindow				=	100;
+	sw -> qualityScoreCoefficient	=	100;
 
 	args_counter = 0;
 

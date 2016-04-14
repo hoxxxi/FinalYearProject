@@ -22,7 +22,7 @@ ProbabilityMatrix::ProbabilityMatrix(string sequenceIn, string scoreIn,  int spl
 	baseMapping['N'] = 4;
 }
 ProbabilityMatrix::~ProbabilityMatrix() {
-	for ( unsigned int i = 0; i < size; i++ )
+	for (int i = 0; i < size; i++ )
 		delete[] matrix[i];
 	delete[] matrix;
 	//cout<<"Probability matrix destroyed: "<<sequence<<endl;
@@ -66,74 +66,123 @@ void ProbabilityMatrix::setZeroMatrix() {
 
 void ProbabilityMatrix::applyBigram(int windowSize)
 {
-	if(windowSize>0){
-		windowSize = (windowSize-1)/2;
+	if(windowSize<0)
+	{
+		this->setZeroMatrix();
+	}
+	else if(windowSize >= size)
+	{
+		double count[5][5]={};
+		double horizontalSum[5]={};
+		for(int k = 0;k<size-1;k++)
+		{
+			++count[baseMapping[sequence[k]]][baseMapping[sequence[k+1]]];
+		}
 
+		for(int edno = 0;edno <5;edno++)
+		{
+			int temp = 0;
+			for(int dve = 0;dve<5;dve++)
+			{
+				temp+=count[edno][dve];
+			}
+			horizontalSum[edno]=temp;
+		}
+		for(int currentPosition = 1; currentPosition < size; currentPosition++)
+		{
+			matrix[currentPosition][baseMapping['A']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/horizontalSum[baseMapping[sequence[currentPosition-1]]] +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/horizontalSum[baseMapping[sequence[currentPosition-1]]]/4.0;
+			matrix[currentPosition][baseMapping['C']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/horizontalSum[baseMapping[sequence[currentPosition-1]]] +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/horizontalSum[baseMapping[sequence[currentPosition-1]]]/4.0;
+			matrix[currentPosition][baseMapping['G']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/horizontalSum[baseMapping[sequence[currentPosition-1]]] +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/horizontalSum[baseMapping[sequence[currentPosition-1]]]/4.0;
+			matrix[currentPosition][baseMapping['T']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/horizontalSum[baseMapping[sequence[currentPosition-1]]] +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/horizontalSum[baseMapping[sequence[currentPosition-1]]]/4.0;
+		}
+		//Initial position is set by an inverse bigram
+		double verticalSum = 0;
+		for(int v = 0;v<5;v++)
+		{
+			verticalSum+=count[v][baseMapping[sequence[1]]];
+		}
+
+		matrix[0][baseMapping['A']]=count[baseMapping['A']][baseMapping[sequence[1]]]/verticalSum+
+				count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+		matrix[0][baseMapping['C']]=count[baseMapping['C']][baseMapping[sequence[1]]]/verticalSum+
+				count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+		matrix[0][baseMapping['G']]=count[baseMapping['G']][baseMapping[sequence[1]]]/verticalSum+
+				count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+		matrix[0][baseMapping['T']]=count[baseMapping['T']][baseMapping[sequence[1]]]/verticalSum+
+				count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+
+	}
+	else {
 		for(int currentPosition = 1; currentPosition < size; currentPosition++)
 		{
 			//Adjust window
-			int start = 0;
-			int end = size-1;
-			if(!(windowSize*2+1>size))
+			int windowPrefix = windowSize/2;
+			int windowSuffix = windowSize/2-((windowSize-1)%2);
+			int start = currentPosition-windowPrefix;
+			int end = currentPosition+windowSuffix+1;
+			if(currentPosition-windowPrefix<0)
 			{
-				int windowPrefix = windowSize;
-				int windowSuffix = windowSize;
-
-				if(currentPosition-windowSize<0)
-				{
-					windowPrefix-=windowSize-currentPosition;
-					windowSuffix+=windowSize-currentPosition;
-				}
-				else if(currentPosition+windowSize>=size)
-				{
-					windowSuffix-=windowSize-(sequence.length()-1-currentPosition);
-					windowPrefix+=windowSize-windowSuffix;
-
-				}
-
-				start = currentPosition-windowPrefix;
-				end = currentPosition+windowSuffix;
+				start+=windowPrefix-currentPosition;
+				end+=windowPrefix-currentPosition;
+			}
+			else if(currentPosition+windowSuffix+1>size)
+			{
+				start-=currentPosition+windowSuffix+1-size;
+				end-=currentPosition+windowSuffix+1-size;
 			}
 			//Define combination counter for the window
-			int count[5][5]={};
-			for(int k = start;k<end;k++)
+			double count[5][5]={};
+			for(int k = start;k<end-1;k++)
 			{
 				++count[baseMapping[sequence[k]]][baseMapping[sequence[k+1]]];
 			}
+			cout<<start<<" hui "<<end<<endl;
+			for(int hui = 0;hui<5;hui++)
+			{
+				for(int putka = 0; putka<5;putka++)
+				{
+					cout<<count[hui][putka]<<"\t";
+				}
+				cout<<"\n";
+			}
+			cout<<"\n";
 			//Check total count of possible combinations
 			double sum = 0;
 			for(int l = 0; l < 5; l++){
 				sum+= count[baseMapping[sequence[currentPosition-1]]][l];
 			}
-			matrix[currentPosition][baseMapping['A']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/sum +
-					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
-			matrix[currentPosition][baseMapping['C']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/sum +
-					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
-			matrix[currentPosition][baseMapping['G']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/sum +
-					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
-			matrix[currentPosition][baseMapping['T']]= (double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum +
-					((double) count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum)/4.0;
+			matrix[currentPosition][baseMapping['A']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['A']]/sum +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum/4.0;
+			matrix[currentPosition][baseMapping['C']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['C']]/sum +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum/4.0;
+			matrix[currentPosition][baseMapping['G']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['G']]/sum +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum/4.0;
+			matrix[currentPosition][baseMapping['T']]= count[baseMapping[sequence[currentPosition-1]]][baseMapping['T']]/sum +
+					count[baseMapping[sequence[currentPosition-1]]][baseMapping['N']]/sum/4.0;
+
+			//Initial position is set by an inverse bigram
+			if(currentPosition==1)
+			{
+				double verticalSum = 0;
+				for(int v = 0;v<5;v++)
+				{
+					verticalSum+=count[v][baseMapping[sequence[1]]];
+				}
+
+				matrix[0][baseMapping['A']]=count[baseMapping['A']][baseMapping[sequence[1]]]/verticalSum+
+						count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+				matrix[0][baseMapping['C']]=count[baseMapping['C']][baseMapping[sequence[1]]]/verticalSum+
+						count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+				matrix[0][baseMapping['G']]=count[baseMapping['G']][baseMapping[sequence[1]]]/verticalSum+
+						count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+				matrix[0][baseMapping['T']]=count[baseMapping['T']][baseMapping[sequence[1]]]/verticalSum+
+						count[baseMapping['N']][baseMapping[sequence[1]]]/verticalSum/4.0;
+			}
 		}
-
-		//Clear split point
-		//	matrix[splitPoint][baseMapping['A']]=0.25;
-		//	matrix[splitPoint][baseMapping['C']]=0.25;
-		//	matrix[splitPoint][baseMapping['G']]=0.25;
-		//	matrix[splitPoint][baseMapping['T']]=0.25;
-
-		//Chargaff's rule
-		matrix[0][baseMapping['A']]=0.292;
-		matrix[0][baseMapping['C']]=0.206;
-		matrix[0][baseMapping['G']]=0.201;
-		matrix[0][baseMapping['T']]=0.301;
-
-		//	matrix[splitPoint+1][baseMapping['A']]=0.292;
-		//	matrix[splitPoint+1][baseMapping['C']]=0.206;
-		//	matrix[splitPoint+1][baseMapping['G']]=0.201;
-		//	matrix[splitPoint+1][baseMapping['T']]=0.301;
-	}
-	else{
-		this->setZeroMatrix();
 	}
 }
 
@@ -173,11 +222,4 @@ void ProbabilityMatrix::applyQualityScore(int qsCoefficient) {
 		}
 		sequence[i] = maxValue;
 	}
-
-	//Clear split point
-//	sequence[splitPoint] = '$';
-//	matrix[splitPoint][baseMapping['A']]=0;
-//	matrix[splitPoint][baseMapping['C']]=0;
-//	matrix[splitPoint][baseMapping['G']]=0;
-//	matrix[splitPoint][baseMapping['T']]=0;
 }

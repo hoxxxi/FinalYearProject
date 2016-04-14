@@ -26,7 +26,7 @@ int main (int argc, char **argv)
 	string output = "output.txt";
 	double x = 10;
 	double z = 10;
-	int bigramWindow = 400;
+	int bigramWindow = 100;
 	int qualityScoreCoeficient = 100;
 	clock_t start;
 	clock_t finish;
@@ -78,7 +78,6 @@ int main (int argc, char **argv)
 		qualityScoreCoeficient = sw.qualityScoreCoefficient;
 	}
 #endif
-
 	ifstream leftFileStream (left_file, ios::in); // /home/yordan/Desktop/
 	ifstream rightFileStream (right_file, ios::in);
 
@@ -114,14 +113,14 @@ int main (int argc, char **argv)
 					right_read.calculateReadInverse();
 
 					ProbabilityMatrix resultingMatrix(
-							right_read.getSequence()+//"N"+
+							right_read.getSequence()+
 							left_read.getSequence(),
-							right_read.getScore()+//"!"+
+							right_read.getScore()+
 							left_read.getScore(),
 							right_read.size());
 
-					resultingMatrix.applyBigram(bigramWindow); // window size 401
-					resultingMatrix.applyQualityScore(100); // QS:BiGram = 100:1
+					resultingMatrix.applyBigram(bigramWindow);
+					resultingMatrix.applyQualityScore(qualityScoreCoeficient);
 
 					string empty;
 					unsigned int * PT = new unsigned int [resultingMatrix.getSize()];
