@@ -26,7 +26,7 @@ int main (int argc, char **argv)
 	string output = "output.txt";
 	double x = 10;
 	double z = 10;
-	int bigramWindow = 100;
+	int bigramWindow = 1000;
 	int qualityScoreCoeficient = 100;
 	clock_t start;
 	clock_t finish;
@@ -137,7 +137,7 @@ int main (int argc, char **argv)
 					borderTable ( PT, resultingMatrix.getSize(), BT );
 
 					/*print*/
-#if 0
+#if 1
 					cout<<"Read No. "<< (lineCounter/4)+1 <<" with label: "<<lineLabel<<endl;
 					cout<<resultingMatrix.getSequence()<<endl;
 					cout<<resultingMatrix.getScore()<<endl;

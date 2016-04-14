@@ -27,7 +27,7 @@ int decode_switches ( int argc, char * argv[], struct TSwitch * sw )
 	/* initialisation */
 	sw -> z							=	10;
 	sw -> x							=	10;
-	sw -> bigramWindow				=	100;
+	sw -> bigramWindow				=	1000;
 	sw -> qualityScoreCoefficient	=	100;
 
 	args_counter = 0;
@@ -107,7 +107,7 @@ void usage ( void )
 	cout << "	-z, --cumulative-threshold\t<dbl>\tBy default set to 10. Cumulative weight threshold. The bigger the threshold, the higher the prefix table construction tolerance."<<endl;
 	cout << "	-x, --exclude-read-threshold\t<dbl>\tBy default set to 10. Exclude reads with insignificant overlap. Higher exculsion percentage generates fewer reads."<<endl;
 	cout << "	-q, --quality-score-coefficient\t<dbl>\tBy default set to 100. Coefficent of quality score : bigram probability distribution. To disregard quality score probability distribution set to 0."<<endl;
-	cout << "	-w, --bigram-window\t\t<dbl>\tBy default set to 400. Length of bigram window. To disregard bigram probability distribution set to 0."<<endl;
+	cout << "	-w, --bigram-window\t\t<dbl>\tBy default set to 1000. Length of bigram window. To disregard bigram probability distribution set to 0."<<endl;
 	cout << "	-h, --help\t\t\tHelp!"<<endl;
 }
 

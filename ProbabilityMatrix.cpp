@@ -59,16 +59,21 @@ void ProbabilityMatrix::setZeroMatrix() {
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			matrix[i][j]=0;
+			matrix[i][j]=0.0;
 		}
 	}
 }
-
 void ProbabilityMatrix::applyBigram(int windowSize)
 {
-	if(windowSize<0)
+	if(windowSize<2)
 	{
-		this->setZeroMatrix();
+		for(int i = 0; i < size; i++)
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					matrix[i][j]=0.25;
+				}
+			}
 	}
 	else if(windowSize >= size)
 	{
@@ -140,16 +145,6 @@ void ProbabilityMatrix::applyBigram(int windowSize)
 			{
 				++count[baseMapping[sequence[k]]][baseMapping[sequence[k+1]]];
 			}
-			cout<<start<<" hui "<<end<<endl;
-			for(int hui = 0;hui<5;hui++)
-			{
-				for(int putka = 0; putka<5;putka++)
-				{
-					cout<<count[hui][putka]<<"\t";
-				}
-				cout<<"\n";
-			}
-			cout<<"\n";
 			//Check total count of possible combinations
 			double sum = 0;
 			for(int l = 0; l < 5; l++){
