@@ -18,6 +18,7 @@ struct TSwitch
 	int		mod;
 	int bigramWindow;
 	int qualityScoreCoefficient;
+	bool print;
 };
 #endif
 

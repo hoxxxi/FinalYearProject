@@ -28,6 +28,7 @@ int main (int argc, char **argv)
 	double z = 10;
 	int bigramWindow = 1000;
 	int qualityScoreCoeficient = 100;
+	bool print = 0;
 	clock_t start;
 	clock_t finish;
 
@@ -36,7 +37,7 @@ int main (int argc, char **argv)
 	unsigned int k = decode_switches ( argc, argv, &sw );
 
 	/* Check the arguments */
-	if ( k < 7 || k > 15)
+	if ( k < 7 || k > 17)
 	{
 		usage();
 		return 1;
@@ -46,7 +47,7 @@ int main (int argc, char **argv)
 		if ( sw.left_filename.size() == 0 )
 		{
 			cout << "Error: No left FASTQ input!" << endl;
-			return 0;
+			return 1;
 		}
 		else
 		{
@@ -56,7 +57,7 @@ int main (int argc, char **argv)
 		if ( sw.right_filename.size() == 0)
 		{
 			cout << "Error: No right FASTQ input!" << endl;
-			return 0;
+			return 1;
 		}
 		else
 		{
@@ -66,16 +67,26 @@ int main (int argc, char **argv)
 		if ( sw.output_filename.size() == 0 )
 		{
 			cout << "Error: Specify output file!" << endl;
+			return 1;
 		}
 		else
 		{
 			output = sw.output_filename;
 		}
 
-		z = sw.z;
+		if(sw.z<0)
+		{
+			cout << "Error: Z must be a non-negtive value!" << endl;
+			return 1;
+		}
+		else
+		{
+			z = sw.z;
+		}
 		x = sw.x;
 		bigramWindow = sw.bigramWindow;
 		qualityScoreCoeficient = sw.qualityScoreCoefficient;
+		print = sw.print;
 	}
 #endif
 	ifstream leftFileStream (left_file, ios::in); // /home/yordan/Desktop/
@@ -126,7 +137,7 @@ int main (int argc, char **argv)
 					unsigned int * PT = new unsigned int [resultingMatrix.getSize()];
 					unsigned int * BT = (unsigned int *) calloc(resultingMatrix.getSize(), sizeof(unsigned int));
 
-					if ( preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod ) ==  0 )
+					if ( preparation ( empty, resultingMatrix.getMatrix(), resultingMatrix.getSize(), z, alphabet, mod ) ==  0 && z>0)
 					{
 						wptable ( sigma, z, PT ); // Weighted Prefix Table
 					}
@@ -137,27 +148,27 @@ int main (int argc, char **argv)
 					borderTable ( PT, resultingMatrix.getSize(), BT );
 
 					/*print*/
-#if 1
-					cout<<"Read No. "<< (lineCounter/4)+1 <<" with label: "<<lineLabel<<endl;
-					cout<<resultingMatrix.getSequence()<<endl;
-					cout<<resultingMatrix.getScore()<<endl;
-					cout << "Weighted Prefix Table:"<<endl;
-					for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
-					{
-						cout << PT[i] << ' ';
+					if(print) {
+						cout<<"Read No. "<< (lineCounter/4)+1 <<" with label: "<<lineLabel<<endl;
+						cout<<resultingMatrix.getSequence()<<endl;
+						cout<<resultingMatrix.getScore()<<endl;
+						cout << "Weighted Prefix Table:"<<endl;
+						for ( unsigned int i = 0; i < resultingMatrix.getSize(); i++ )
+						{
+							cout << PT[i] << ' ';
+						}
+						cout << "\nWeighted Border Table:"<<endl;
+						for(int r = 0; r<resultingMatrix.getSize();r++)
+						{
+							cout<<BT[r]<<" ";
+						}
+						resultingMatrix.printMatrix();
 					}
-					cout << "\nWeighted Border Table:"<<endl;
-					for(int r = 0; r<resultingMatrix.getSize();r++)
-					{
-						cout<<BT[r]<<" ";
-					}
-					resultingMatrix.printMatrix();
-#endif
 
 					int shortestReadLength = min(right_read.size(), left_read.size());
 					int overlap = BT[resultingMatrix.getSize()-1];
 
-					while(shortestReadLength<overlap) {
+					while(shortestReadLength<=overlap) {
 						overlap = BT[overlap-1]; // Get the border of the border
 					}
 
