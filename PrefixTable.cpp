@@ -1,10 +1,7 @@
-//============================================================================
-// Name        : PrefixTable.cpp
-// Author      : Dachi
-// Version     :
-// Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
-//============================================================================
+/*
+ *  Created on: 1 Feb 2016
+ *  Author: Yordan Petrov Yordanov
+ */
 
 #include "PrefixTable.h"
 

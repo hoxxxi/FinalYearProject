@@ -1,8 +1,6 @@
 /*
- * BorderTable.cpp
- *
  *  Created on: 19 Feb 2016
- *      Author: yordan
+ *  Author: Yordan Petrov Yordanov
  */
 
 #include "BorderTable.h"

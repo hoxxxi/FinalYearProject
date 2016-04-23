@@ -1,8 +1,6 @@
 /*
- * wstr.cpp
- *
  *  Created on: 21 Mar 2016
- *      Author: yordan
+ *  Author: Yordan Petrov Yordanov
  */
 
 #include "defs.h"

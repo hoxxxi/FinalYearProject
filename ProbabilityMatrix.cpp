@@ -1,8 +1,6 @@
 /*
- * ProbabilityMatrix.cpp
- *
- *  Created on: 10 Mar 2016
- *      Author: yordan
+ *  Created on: 28 Feb 2016
+ *  Author: Yordan Petrov Yordanov
  */
 
 #include "ProbabilityMatrix.h"

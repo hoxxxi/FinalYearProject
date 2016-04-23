@@ -1,8 +1,6 @@
 /*
- * PrefixTable.h
- *
- *  Created on: 20 Mar 2016
- *      Author: yordan
+ *  Created on: 10 Feb 2016
+ *  Author: Yordan Petrov Yordanov
  */
 
 #ifndef PREFIXTABLE_H_

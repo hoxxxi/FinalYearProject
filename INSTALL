@@ -22,4 +22,4 @@ The shell command `make -f Makefile' should compile this program.
 After compilation the binary `run' will be created in the working 
 directory. You may call it from this directory via
 
-$  ./run -l ./data/left.fastq -r ./data/right.fastq -o output.txt
+$  ./run -l ./data/left.fastq -r ./data/right.fastq -o output.fasta

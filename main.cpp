@@ -89,7 +89,7 @@ int main (int argc, char **argv)
 		print = sw.print;
 	}
 #endif
-	ifstream leftFileStream (left_file, ios::in); // /home/yordan/Desktop/
+	ifstream leftFileStream (left_file, ios::in);
 	ifstream rightFileStream (right_file, ios::in);
 
 	ofstream file;
@@ -181,7 +181,6 @@ int main (int argc, char **argv)
 						file.open(output.c_str(), fstream::out | fstream::app);
 						file<<">"+lineLabel+"\n"+joinedString+"\n";
 						file.close();
-//						cout<<overlap<<"\t"<<shortestReadLength<<"\t"<<(double) overlap/shortestReadLength<<endl;
 					}
 					//Clean up
 					delete[] PT;

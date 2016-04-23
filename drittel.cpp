@@ -1,3 +1,8 @@
+/*
+ *  Author: Liu, C., (2015), WPT (Version 2.2)
+ *  Available from: https://github.com/YagaoLiu/WPT
+ */
+
 inline bool leq(int a1, int a2,   int b1, int b2) { // lexic. order for pairs
   return(a1 < b1 || a1 == b1 && a2 <= b2); 
 }                                                   // and triples

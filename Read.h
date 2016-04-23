@@ -1,8 +1,6 @@
 /*
- * Read.h
- *
  *  Created on: 10 Mar 2016
- *      Author: yordan
+ *  Author: Yordan Petrov Yordanov
  */
 
 #ifndef READ_H_

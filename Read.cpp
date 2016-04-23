@@ -1,8 +1,6 @@
 /*
- * Read.cpp
- *
  *  Created on: 10 Mar 2016
- *      Author: yordan
+ *  Author: Yordan Petrov Yordanov
  */
 
 #include "Read.h"
@@ -13,7 +11,7 @@ Read::Read(string sequenceIn, string scoreIn) {
 }
 
 Read::~Read() {
-//	cout<<"Read destroyed: "<<sequence<<endl;
+
 }
 
 string Read::getSequence() {

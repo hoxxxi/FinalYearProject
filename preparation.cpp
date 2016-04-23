@@ -1,3 +1,9 @@
+/*
+ *  Author: Liu, C., (2015), WPT (Version 2.2)
+ *  Available from: https://github.com/YagaoLiu/WPT
+ *  Extensions by: Yordan Petrov Yordanov
+ */
+
 #include <iostream>
 #include <vector>
 #include <string>
